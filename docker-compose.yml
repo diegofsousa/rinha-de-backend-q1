@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+  postgres:
+    container_name: postgres-service
+    hostname: postgres-service
+    image: postgres:12.1
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: rinha
+      TZ: GMT-3
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ./ddl.sql:/docker-entrypoint-initdb.d/1.sql:ro
+    networks:
+      - datanodes-network
+
+volumes:
+  db-data:
+
+networks:
+  datanodes-network:
+    driver: bridge

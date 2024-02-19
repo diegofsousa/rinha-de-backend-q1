@@ -2,7 +2,9 @@ package configuration
 
 import (
 	"context"
-	api "github.com/diegofsousa/rinha-de-backend-q1/internal/infra/api/clients"
+	"github.com/diegofsousa/rinha-de-backend-q1/internal/application/usecase"
+	api "github.com/diegofsousa/rinha-de-backend-q1/internal/infra/api/consumer"
+	"github.com/diegofsousa/rinha-de-backend-q1/internal/infra/repository"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
@@ -27,8 +29,10 @@ func NewApp(config *viper.Viper) *App {
 }
 
 func (a *App) Start() {
-	clients := api.NewClients()
+	consumerUsecase := usecase.NewConsumer(repository.NewConsumer(a.config.GetString("database.url")))
+	clients := api.NewConsumer(consumerUsecase)
 	clients.Register(a.server)
+	log.Info("Running at ", a.config.GetString("server.host"))
 
 	log.Info(context.Background(), a.server.Start(a.config.GetString("server.host")), "Server fatal error")
 }
